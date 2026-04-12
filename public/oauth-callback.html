@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OAuth Callback</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+        .container {
+            background: white;
+            border-radius: 20px;
+            padding: 40px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+            text-align: center;
+            max-width: 400px;
+        }
+        .spinner {
+            width: 50px;
+            height: 50px;
+            border: 4px solid #f3f3f3;
+            border-top: 4px solid #667eea;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 20px;
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        h2 {
+            color: #1D1D1F;
+            margin-bottom: 10px;
+        }
+        p {
+            color: #86868B;
+            font-size: 14px;
+        }
+        .error {
+            background: #FEF2F2;
+            border: 1px solid #FECACA;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .error h3 {
+            color: #DC2626;
+            margin-bottom: 10px;
+        }
+        .error p {
+            color: #7F1D1D;
+        }
+        .success {
+            background: #F0FDF4;
+            border: 1px solid #BBF7D0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-top: 20px;
+        }
+        .success h3 {
+            color: #16A34A;
+            margin-bottom: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div id="loading">
+            <div class="spinner"></div>
+            <h2>Completing Authentication</h2>
+            <p>Please wait...</p>
+        </div>
+        <div id="error" style="display: none;" class="error">
+            <h3>Authentication Failed</h3>
+            <p id="error-message"></p>
+        </div>
+        <div id="success" style="display: none;" class="success">
+            <h3>✓ Success!</h3>
+            <p>Redirecting you back...</p>
+        </div>
+    </div>
+
+    <script>
+        // Parse URL parameters and hash
+        function getParams() {
+            const params = new URLSearchParams(window.location.search);
+            const hash = window.location.hash.substring(1);
+            const hashParams = new URLSearchParams(hash);
+            
+            for (const [key, value] of hashParams) {
+                params.set(key, value);
+            }
+            
+            return params;
+        }
+
+        // Determine provider from URL path or params
+        function getProvider() {
+            const path = window.location.pathname.toLowerCase();
+            const params = getParams();
+
+            // Check URL params first
+            const providerParam = params.get('provider');
+            if (providerParam) return providerParam;
+
+            // Check path
+            if (path.includes('google')) return 'Google';
+            if (path.includes('github')) return 'GitHub';
+            if (path.includes('apple')) return 'Apple';
+
+            // Check for specific tokens to auto-detect provider
+            const idToken = params.get('id_token');
+            if (idToken) return 'Google';
+
+            // For Google OAuth (implicit flow), check if we have access_token
+            const accessToken = params.get('access_token') || params.get('token');
+            if (accessToken) return 'Google';
+
+            // For GitHub, check if we have code
+            const code = params.get('code');
+            if (code) return 'GitHub';
+
+            return null;
+        }
+
+        // Send message to opener window
+        function sendMessage(data) {
+            if (window.opener && !window.opener.closed) {
+                window.opener.postMessage(data, window.location.origin);
+            }
+        }
+
+        // Show error
+        function showError(message) {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('error').style.display = 'block';
+            document.getElementById('error-message').textContent = message;
+        }
+
+        // Show success
+        function showSuccess() {
+            document.getElementById('loading').style.display = 'none';
+            document.getElementById('success').style.display = 'block';
+        }
+
+        // Main OAuth handling
+        async function handleOAuth() {
+            const provider = getProvider();
+            const params = getParams();
+
+            console.log('OAuth callback - Provider:', provider);
+            console.log('OAuth callback - Params:', Object.fromEntries(params));
+            console.log('OAuth callback - Hash:', window.location.hash);
+
+            if (!provider) {
+                const errorMsg = 'Invalid OAuth provider. Detected params: ' + Object.fromEntries(params);
+                console.error(errorMsg);
+                showError(errorMsg);
+                return;
+            }
+
+            let oauthData = {
+                type: 'oauth-success',
+                provider: provider
+            };
+
+            try {
+                // Google OAuth (implicit flow - id_token in URL hash)
+                if (provider === 'Google') {
+                    const idToken = params.get('id_token') || params.get('access_token');
+                    const accessToken = params.get('access_token');
+
+                    console.log('Google OAuth - ID Token:', idToken ? 'Present' : 'Missing');
+
+                    if (idToken) {
+                        // Decode the ID token to get user info
+                        let userInfo = {};
+                        try {
+                            const parts = idToken.split('.');
+                            if (parts.length === 3) {
+                                const payload = JSON.parse(atob(parts[1].replace(/-/g, '+').replace(/_/g, '/')));
+                                userInfo = {
+                                    name: payload.name,
+                                    email: payload.email,
+                                    picture: payload.picture,
+                                    provider_id: payload.sub
+                                };
+                            }
+                        } catch (e) {
+                            console.error('Failed to decode ID token:', e);
+                        }
+
+                        // Send the ID token + user info to parent window
+                        oauthData.id_token = idToken;
+                        oauthData.accessToken = accessToken;
+                        oauthData.name = userInfo.name;
+                        oauthData.email = userInfo.email;
+                        oauthData.picture = userInfo.picture;
+                        oauthData.provider_id = userInfo.provider_id;
+
+                        console.log('Sending ID token to parent:', oauthData);
+                        sendMessage(oauthData);
+                        showSuccess();
+                        setTimeout(() => window.close(), 1000);
+                    } else {
+                        const error = params.get('error');
+                        const errorDesc = params.get('error_description');
+                        console.error('No ID token. Error:', error, errorDesc);
+                        throw new Error(errorDesc || error || 'No authentication token received');
+                    }
+                }
+                
+                // GitHub OAuth (authorization code flow)
+                else if (provider === 'GitHub') {
+                    const code = params.get('code');
+
+                    console.log('GitHub OAuth - Code:', code ? 'Present' : 'Missing');
+
+                    if (code) {
+                        // Send the code to parent window - backend will exchange it for token
+                        oauthData.code = code;
+
+                        console.log('Sending code to parent:', oauthData);
+                        sendMessage(oauthData);
+                        showSuccess();
+                        setTimeout(() => window.close(), 1500);
+                    } else {
+                        const error = params.get('error');
+                        const errorDesc = params.get('error_description');
+                        console.error('GitHub OAuth - No code. Error:', error, errorDesc);
+                        throw new Error(errorDesc || error || 'No authorization code received');
+                    }
+                }
+                
+                // Apple OAuth
+                else if (provider === 'Apple') {
+                    const code = params.get('code');
+                    const idToken = params.get('id_token');
+                    
+                    if (code || idToken) {
+                        const verifyResponse = await fetch('http://localhost:8000/api/auth/apple/verify', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json'
+                            },
+                            body: JSON.stringify({ 
+                                code,
+                                id_token: idToken
+                            })
+                        });
+                        
+                        if (!verifyResponse.ok) {
+                            const errorData = await verifyResponse.json();
+                            throw new Error(errorData.message || 'Failed to verify authentication');
+                        }
+                        
+                        const userData = await verifyResponse.json();
+                        
+                        oauthData.email = userData.email;
+                        oauthData.name = userData.name || 'Apple User';
+                        oauthData.provider_id = userData.sub;
+                        oauthData.idToken = idToken;
+                        
+                        sendMessage(oauthData);
+                        showSuccess();
+                        setTimeout(() => window.close(), 1500);
+                    } else {
+                        throw new Error('No authorization code received');
+                    }
+                }
+            } catch (error) {
+                console.error('OAuth error:', error);
+                showError(error.message || 'Authentication failed');
+                sendMessage({
+                    type: 'oauth-error',
+                    provider: provider,
+                    error: error.message
+                });
+            }
+        }
+
+        // Handle errors
+        window.onerror = function(message, source, lineno, colno, error) {
+            console.error('OAuth error:', error);
+            showError('An unexpected error occurred: ' + message);
+        };
+
+        // Start OAuth handling
+        handleOAuth();
+    </script>
+</body>
+</html>

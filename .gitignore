@@ -1,0 +1,73 @@
+# Dependencies
+node_modules/
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+.Python
+pip-log.txt
+pip-delete-this-directory.txt
+venv/
+.venv/
+
+# Environment variables - NEVER COMMIT SECRETS
+.env
+.env.local
+.env.*.local
+*.pem
+*.key
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Build outputs
+dist/
+build/
+*.egg-info/
+
+# Logs
+*.log
+logs/
+
+# Database (SQLite)
+*.db
+*.sqlite
+*.sqlite3
+
+# Uploads
+uploads/
+backend/uploads/
+
+# OS
+.DS_Store
+Thumbs.db
+$null
+
+# Testing
+.pytest_cache/
+.coverage
+htmlcov/
+
+# Temporary files
+*.tmp
+*.temp
+*~
+*.bak
+
+# Debug
+debug/
+*.log
+
+# Qwen internal
+.qwen/commands/*.backup
+.qwen/commands/*.md
+
+# Images (optional - remove if you want to track)
+*.png
+*.jpeg
+*.jpg
+*.gif

@@ -1,0 +1,62 @@
+/* Responsive styles for React Native Web */
+
+/* Mobile - cards stack to 1 per row */
+@media (max-width: 768px) {
+  .grid-responsive {
+    padding: 0 8px !important;
+  }
+  .card-responsive {
+    width: 92% !important;
+    margin: 4px auto !important;
+    max-width: 300px !important;
+  }
+  .header-responsive {
+    padding-top: 25px !important;
+    padding-bottom: 25px !important;
+  }
+  .title-responsive {
+    font-size: 28px !important;
+    text-align: center !important;
+  }
+  .subtitle-responsive {
+    font-size: 16px !important;
+    text-align: center !important;
+  }
+  .card-image-responsive {
+    height: 140px !important;
+  }
+  .detail-layout-responsive {
+    flex-direction: column !important;
+  }
+  .detail-image-responsive {
+    height: 250px !important;
+    border-radius: 12px !important;
+  }
+  .detail-content-responsive {
+    padding: 15px !important;
+  }
+  .detail-title-responsive {
+    font-size: 24px !important;
+  }
+  .detail-price-responsive {
+    font-size: 28px !important;
+  }
+}
+
+/* Tablet - 2 per row */
+@media (min-width: 769px) and (max-width: 1024px) {
+  .card-responsive {
+    width: 46% !important;
+    margin: 2% !important;
+    max-width: 320px !important;
+  }
+}
+
+/* Desktop - 3 per row */
+@media (min-width: 1025px) {
+  .card-responsive {
+    width: 30% !important;
+    margin: 1.5% !important;
+    max-width: 350px !important;
+  }
+}
