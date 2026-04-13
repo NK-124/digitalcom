@@ -143,6 +143,7 @@ const AdminDashboard = ({ onLogout, onSectionChange }) => {
       const response = await fetch(url, {
         method: method,
         body: formData,
+        credentials: 'include'
       });
 
       if (response.ok) {

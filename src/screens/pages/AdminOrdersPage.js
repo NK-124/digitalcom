@@ -32,7 +32,8 @@ const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
       const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status }),
+        credentials: 'include'
       });
 
       if (response.ok) {

@@ -138,7 +138,8 @@ const CoursePage = ({ onNavigate, onSignUp }) => {
         : `${API_URL}/api/courses`;
       const response = await fetch(url, {
         method: editingCourse ? 'PUT' : 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include'
       });
       if (response.ok) {
         toast.success(editingCourse ? 'Course updated successfully!' : 'Course created successfully!');
@@ -164,7 +165,7 @@ const CoursePage = ({ onNavigate, onSignUp }) => {
     setShowDeleteModal(false);
     if (!deleteTargetId) return;
     try {
-      const response = await fetch(`${API_URL}/api/courses/${deleteTargetId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/courses/${deleteTargetId}`, { method: 'DELETE', credentials: 'include' });
       if (response.ok) {
         toast.success('Course deleted successfully!');
         fetchCourses();

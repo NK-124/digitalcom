@@ -210,7 +210,11 @@ const GiftCardPage = ({ onNavigate, onSignUp }) => {
         : `${API_URL}/api/gift-cards`;
       const method = editingCard ? 'PUT' : 'POST';
 
-      const response = await fetch(url, { method, body: formData });
+      const response = await fetch(url, {
+        method,
+        body: formData,
+        credentials: 'include'
+      });
       const responseText = await response.text();
 
       if (response.ok) {
@@ -251,7 +255,10 @@ const GiftCardPage = ({ onNavigate, onSignUp }) => {
     setShowDeleteModal(false);
     if (!deleteTargetId) return;
     try {
-      const response = await fetch(`${API_URL}/api/gift-cards/${deleteTargetId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/gift-cards/${deleteTargetId}`, {
+        method: 'DELETE',
+        credentials: 'include'
+      });
       if (response.ok) {
         toast.success('Gift card deleted successfully!');
         fetchGiftCards();

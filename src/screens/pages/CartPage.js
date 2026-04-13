@@ -122,7 +122,8 @@ const CartPage = ({ onNavigate, onSignUp }) => {
           customerEmail: currentUser?.email || '',
           success_url: window.location.origin,
           cancel_url: window.location.origin
-        })
+        }),
+        credentials: 'include'
       });
 
       if (!response.ok) {

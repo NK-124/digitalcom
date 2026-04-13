@@ -244,7 +244,8 @@ const TemplatePage = ({ onNavigate, onSignUp }) => {
       const url = editingTemplate ? `${API_URL}/api/templates/${editingTemplate.id}` : `${API_URL}/api/templates`;
       const response = await fetch(url, {
         method: editingTemplate ? 'PUT' : 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include'
       });
       if (response.ok) {
         toast.success(editingTemplate ? 'Template updated!' : 'Template created!');
@@ -264,7 +265,7 @@ const TemplatePage = ({ onNavigate, onSignUp }) => {
   const handleDelete = async (templateId) => {
     if (!confirm('Delete this template?')) return;
     try {
-      const response = await fetch(`${API_URL}/api/templates/${templateId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/templates/${templateId}`, { method: 'DELETE', credentials: 'include' });
       if (response.ok) {
         toast.success('Template deleted!');
         fetchTemplates();

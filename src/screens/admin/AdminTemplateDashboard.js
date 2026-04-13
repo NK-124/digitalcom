@@ -93,6 +93,7 @@ const AdminTemplateDashboard = ({ onLogout }) => {
       const response = await fetch(url, {
         method: method,
         body: formData,
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -145,6 +146,7 @@ const AdminTemplateDashboard = ({ onLogout }) => {
             try {
               const response = await fetch(`${API_URL}/api/templates/${id}`, {
                 method: 'DELETE',
+                credentials: 'include'
               });
               
               if (response.ok) {

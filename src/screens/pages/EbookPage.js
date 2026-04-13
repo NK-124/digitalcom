@@ -175,7 +175,7 @@ const EbookPage = ({ onNavigate, onSignUp }) => {
         : `${API_URL}/api/ebooks`;
       const method = editingBook ? 'PUT' : 'POST';
 
-      const response = await fetch(url, { method, body: formData });
+      const response = await fetch(url, { method, body: formData, credentials: 'include' });
       const responseText = await response.text();
 
       if (response.ok) {
@@ -216,7 +216,7 @@ const EbookPage = ({ onNavigate, onSignUp }) => {
     setShowDeleteModal(false);
     if (!deleteTargetId) return;
     try {
-      const response = await fetch(`${API_URL}/api/ebooks/${deleteTargetId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/ebooks/${deleteTargetId}`, { method: 'DELETE', credentials: 'include' });
       if (response.ok) {
         toast.success('eBook deleted successfully!');
         fetchEbooks();

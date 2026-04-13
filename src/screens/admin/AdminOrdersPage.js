@@ -41,7 +41,8 @@ const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
       const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ status })
+        body: JSON.stringify({ status }),
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -98,7 +99,8 @@ const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
 
       const response = await fetch(`${API_URL}/api/orders/${selectedOrder.id}/deliverable`, {
         method: 'PUT',
-        body: formData
+        body: formData,
+        credentials: 'include'
       });
 
       if (response.ok) {

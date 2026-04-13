@@ -256,7 +256,8 @@ const BlogPage = ({ onNavigate, onSignUp }) => {
       const url = editingBlog ? `${API_URL}/api/blogs/${editingBlog.id}` : `${API_URL}/api/blogs`;
       const response = await fetch(url, {
         method: editingBlog ? 'PUT' : 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -279,7 +280,7 @@ const BlogPage = ({ onNavigate, onSignUp }) => {
   const handleDelete = async (blogId) => {
     if (!confirm('Delete this blog?')) return;
     try {
-      const response = await fetch(`${API_URL}/api/blogs/${blogId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/blogs/${blogId}`, { method: 'DELETE', credentials: 'include' });
       if (response.ok) { 
         toast.success('Blog deleted successfully!'); 
         fetchBlogs(); 

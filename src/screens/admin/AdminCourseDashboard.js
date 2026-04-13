@@ -83,6 +83,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
       const response = await fetch(`${API_URL}/api/courses`, {
         method: 'POST',
         body: formData,
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -115,6 +116,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
       const response = await fetch(`${API_URL}/api/courses/${selectedCourse.id}/videos`, {
         method: 'POST',
         body: formData,
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -146,6 +148,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
       const response = await fetch(`${API_URL}/api/courses/${selectedCourse.id}/notes`, {
         method: 'POST',
         body: formData,
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -176,6 +179,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
       const response = await fetch(`${API_URL}/api/courses/${selectedCourse.id}/pdfs`, {
         method: 'POST',
         body: formData,
+        credentials: 'include'
       });
 
       if (response.ok) {
@@ -200,7 +204,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
         style: 'destructive',
         onPress: async () => {
           try {
-            const response = await fetch(`${API_URL}/api/courses/${id}`, { method: 'DELETE' });
+            const response = await fetch(`${API_URL}/api/courses/${id}`, { method: 'DELETE', credentials: 'include' });
             if (response.ok) {
               fetchCourses();
               Alert.alert('Success', 'Course deleted!');
