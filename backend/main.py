@@ -275,23 +275,39 @@ def revoke_refresh_token(db: Session, token: str, reason: str = "rotation"):
 def create_refresh_token_record(db: Session, user_id: int, token: str,
                                session_id: str, ip_address: str = None,
                                user_agent: str = None):
-    """Store refresh token metadata for rotation tracking"""
+    """Store or update refresh token metadata for rotation tracking"""
     try:
         token_hash = hash_token(token)
-        refresh_token = RefreshToken(
-            user_id=user_id,
-            token_hash=token_hash,
-            session_id=session_id,
-            expires_at=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
-            ip_address=ip_address,
-            user_agent=user_agent
-        )
-        db.add(refresh_token)
+        # Check if session already exists
+        existing_session = db.query(RefreshToken).filter(RefreshToken.session_id == session_id).first()
+        
+        if existing_session:
+            # Update existing session
+            existing_session.token_hash = token_hash
+            existing_session.expires_at = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
+            existing_session.ip_address = ip_address
+            existing_session.user_agent = user_agent
+            existing_session.is_active = 1
+            existing_session.revoked_at = None
+            refresh_token = existing_session
+        else:
+            # Create new session
+            refresh_token = RefreshToken(
+                user_id=user_id,
+                token_hash=token_hash,
+                session_id=session_id,
+                expires_at=datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS),
+                ip_address=ip_address,
+                user_agent=user_agent
+            )
+            db.add(refresh_token)
+        
         db.commit()
         db.refresh(refresh_token)
         return refresh_token
     except Exception as e:
-        print(f"Failed to create refresh token record: {e}")
+        db.rollback()
+        print(f"Failed to create/update refresh token record: {e}")
         return None
 
 # OAuth Configuration
@@ -653,25 +669,12 @@ def create_refresh_token(data: dict):
     to_encode.update({"exp": expire, "type": "refresh"})
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-async def require_admin(token: str = None):
-    """Require valid admin JWT token from cookie"""
+async def require_admin(request: Request, db: Session = Depends(get_db)):
+    """Require valid admin JWT token from cookie and check admin privileges"""
+    token = request.cookies.get("access_token")
     if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        username: str = payload.get("sub")
-        if username is None:
-            raise HTTPException(status_code=401, detail="Invalid token")
-        return payload
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(status_code=401, detail="Token expired")
-    except:
-        raise HTTPException(status_code=401, detail="Invalid token")
-
-async def get_current_admin_user(token: Optional[str] = None, db: Session = Depends(get_db)):
-    """Get current admin user from JWT token, checking both admin_users and oauth_users tables"""
-    if not token:
-        raise HTTPException(status_code=401, detail="Not authenticated")
+        raise HTTPException(status_code=401, detail="Not authenticated - Admin access required")
+    
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
@@ -683,21 +686,27 @@ async def get_current_admin_user(token: Optional[str] = None, db: Session = Depe
         # Check admin_users table first (traditional admin)
         admin_user = db.query(AdminUser).filter(AdminUser.username == username).first()
         if admin_user and admin_user.is_admin:
-            return {"username": username, "is_admin": True, "type": "admin_user"}
-        
+            return payload
+            
         # Check oauth_users table (OAuth users with admin flag)
         if user_id:
             oauth_user = db.query(OAuthUser).filter(OAuthUser.id == user_id).first()
             if oauth_user and oauth_user.is_admin:
-                return {"username": oauth_user.email, "is_admin": True, "type": "oauth_user", "user_id": user_id}
-        
+                return payload
+                
         # User is not an admin
-        raise HTTPException(status_code=403, detail="User does not have admin privileges")
+        raise HTTPException(status_code=403, detail="Forbidden - Admin privileges required")
         
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(status_code=401, detail="Token expired")
     except HTTPException:
         raise
     except Exception as e:
-        raise HTTPException(status_code=401, detail="Invalid token")
+        raise HTTPException(status_code=401, detail=f"Authentication error: {str(e)}")
+
+async def get_current_admin_user(request: Request, db: Session = Depends(get_db)):
+    """Get current admin user from JWT token, checking both admin_users and oauth_users tables"""
+    return await require_admin(request, db)
 
 # Initialize default admin user - SECURED: generates random password if not set
 def init_admin_user(db: Session):

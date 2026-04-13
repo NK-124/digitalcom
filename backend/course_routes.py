@@ -1,7 +1,7 @@
 # ==================== COURSE API ROUTES ====================
 # For Courses with Videos, Notes, and PDFs
 
-from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Header
+from fastapi import APIRouter, Depends, UploadFile, File, Form, HTTPException, Header, Request
 from sqlalchemy import create_engine, Column, Integer, String, Text, DateTime, ForeignKey, Float
 from sqlalchemy.orm import sessionmaker, Session, relationship, declarative_base
 from typing import Optional, List
@@ -51,6 +51,23 @@ class CourseModel(CourseBase):
     thumbnail_url = Column(String)
     created_at = Column(DateTime, default=datetime.utcnow)
 
+class AdminUser(CourseBase):
+    __tablename__ = "admin_users"
+    id = Column(Integer, primary_key=True)
+    username = Column(String, unique=True)
+    hashed_password = Column(String)
+    is_admin = Column(Integer, default=0)
+
+class OAuthUser(CourseBase):
+    __tablename__ = "oauth_users"
+    id = Column(Integer, primary_key=True)
+    email = Column(String, unique=True)
+    name = Column(String)
+    provider = Column(String)
+    provider_id = Column(String, unique=True)
+    picture = Column(String, nullable=True)
+    is_admin = Column(Integer, default=0)
+
 class VideoModel(CourseBase):
     __tablename__ = "videos"
 
@@ -93,42 +110,19 @@ def get_course_db():
     finally:
         db.close()
 
-async def get_current_admin_user(authorization: Optional[str] = Header(None), db: Session = Depends(get_course_db)):
-    """Get current admin user from JWT token"""
-    if not authorization:
+async def get_current_admin_user(request: Request, db: Session = Depends(get_course_db)):
+    """Get current admin user from JWT token (from cookie)"""
+    token = request.cookies.get("access_token")
+    if not token:
         raise HTTPException(status_code=401, detail="Not authenticated")
     
-    # Extract token from "Bearer <token>"
-    token = authorization.replace("Bearer ", "") if authorization.startswith("Bearer ") else authorization
-    
     try:
-        from passlib.context import CryptContext
-        from sqlalchemy import query
-        
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         username: str = payload.get("sub")
         user_id: int = payload.get("user_id")
         
         if username is None:
             raise HTTPException(status_code=401, detail="Invalid token")
-        
-        # Import models for admin check
-        class AdminUser(CourseBase):
-            __tablename__ = "admin_users"
-            id = Column(Integer, primary_key=True)
-            username = Column(String, unique=True)
-            hashed_password = Column(String)
-            is_admin = Column(Integer, default=0)
-        
-        class OAuthUser(CourseBase):
-            __tablename__ = "oauth_users"
-            id = Column(Integer, primary_key=True)
-            email = Column(String, unique=True)
-            name = Column(String)
-            provider = Column(String)
-            provider_id = Column(String, unique=True)
-            picture = Column(String, nullable=True)
-            is_admin = Column(Integer, default=0)
         
         # Check admin_users table first (traditional admin)
         admin_user = db.query(AdminUser).filter(AdminUser.username == username).first()
