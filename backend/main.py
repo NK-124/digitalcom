@@ -98,10 +98,13 @@ async def add_security_headers(request: Request, call_next):
 @app.middleware("http")
 async def add_cors_to_all_responses(request: Request, call_next):
     response = await call_next(request)
-    response.headers["Access-Control-Allow-Origin"] = "http://localhost:3000"
-    response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
-    response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
-    response.headers["Access-Control-Allow-Credentials"] = "true"
+    # Using the defined frontend_url or allowing the origin of the request if it matches allowed_origins
+    origin = request.headers.get("origin")
+    if origin in allowed_origins:
+        response.headers["Access-Control-Allow-Origin"] = origin
+        response.headers["Access-Control-Allow-Methods"] = "GET, POST, PUT, DELETE, OPTIONS"
+        response.headers["Access-Control-Allow-Headers"] = "Content-Type, Authorization"
+        response.headers["Access-Control-Allow-Credentials"] = "true"
     return response
 
 # Firebase Configuration
@@ -364,38 +367,6 @@ if STRIPE_SECRET_KEY:
     print("[OK] Stripe initialized")
 else:
     print("[WARN] Stripe not configured - set STRIPE_SECRET_KEY in .env")
-
-# Serve frontend - static files + SPA routing
-FRONTEND_BUILD_DIR = os.path.join(Path(__file__).parent.parent, "dist")
-
-@app.get("/{full_path:path}")
-async def serve_frontend(full_path: str):
-    """Serve static files or index.html for SPA routing"""
-    if os.path.exists(FRONTEND_BUILD_DIR):
-        file_path = os.path.join(FRONTEND_BUILD_DIR, full_path)
-        # If it's a file, serve it
-        if os.path.isfile(file_path):
-            return FileResponse(file_path)
-        # Otherwise serve index.html for SPA
-        index_path = os.path.join(FRONTEND_BUILD_DIR, "index.html")
-        if os.path.exists(index_path):
-            return FileResponse(index_path)
-    
-    # Fallback to public directory
-    PUBLIC_DIR = os.path.join(Path(__file__).parent.parent, "public")
-    if os.path.exists(PUBLIC_DIR):
-        file_path = os.path.join(PUBLIC_DIR, full_path)
-        if os.path.isfile(file_path):
-            return FileResponse(file_path)
-        index_path = os.path.join(PUBLIC_DIR, "index.html")
-        if os.path.exists(index_path):
-            return FileResponse(index_path)
-    
-    raise HTTPException(status_code=404, detail="Not found")
-
-@app.head("/{full_path:path}")
-async def serve_frontend_head(full_path: str):
-    return await serve_frontend(full_path)
 
 # Initialize Cloudinary
 CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
@@ -2916,6 +2887,38 @@ async def oauth_callback(provider: str):
     return {"message": "OAuth callback received", "provider": provider}
 
 # =========================================================
+
+# Serve frontend - static files + SPA routing
+FRONTEND_BUILD_DIR = os.path.join(Path(__file__).parent.parent, "dist")
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """Serve static files or index.html for SPA routing"""
+    if os.path.exists(FRONTEND_BUILD_DIR):
+        file_path = os.path.join(FRONTEND_BUILD_DIR, full_path)
+        # If it's a file, serve it
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        # Otherwise serve index.html for SPA
+        index_path = os.path.join(FRONTEND_BUILD_DIR, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+    
+    # Fallback to public directory
+    PUBLIC_DIR = os.path.join(Path(__file__).parent.parent, "public")
+    if os.path.exists(PUBLIC_DIR):
+        file_path = os.path.join(PUBLIC_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        index_path = os.path.join(PUBLIC_DIR, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+    
+    raise HTTPException(status_code=404, detail="Not found")
+
+@app.head("/{full_path:path}")
+async def serve_frontend_head(full_path: str):
+    return await serve_frontend(full_path)
 
 if __name__ == "__main__":
     import uvicorn

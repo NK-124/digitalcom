@@ -1,7 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
-import apiClient from './apiClient';
-
-// Use centralized API URL from apiClient
+import { apiClient, authEvents } from './apiClient';
 import API_URL from './apiClient';
 
 /**
