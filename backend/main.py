@@ -365,20 +365,37 @@ if STRIPE_SECRET_KEY:
 else:
     print("[WARN] Stripe not configured - set STRIPE_SECRET_KEY in .env")
 
-# Serve frontend static files in production (DigitalOcean)
-# html=True enables SPA routing - serves index.html for unknown paths
+# Serve frontend - static files + SPA routing
 FRONTEND_BUILD_DIR = os.path.join(Path(__file__).parent.parent, "dist")
-if os.path.exists(FRONTEND_BUILD_DIR):
-    # Serve frontend build with SPA support
-    app.mount("/", StaticFiles(directory=FRONTEND_BUILD_DIR, html=True), name="frontend")
-    print(f"[OK] Frontend static files mounted from: {FRONTEND_BUILD_DIR}")
-else:
-    print(f"[WARN] Frontend build directory not found at: {FRONTEND_BUILD_DIR}")
-    # Fallback: mount public directory for development
+
+@app.get("/{full_path:path}")
+async def serve_frontend(full_path: str):
+    """Serve static files or index.html for SPA routing"""
+    if os.path.exists(FRONTEND_BUILD_DIR):
+        file_path = os.path.join(FRONTEND_BUILD_DIR, full_path)
+        # If it's a file, serve it
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        # Otherwise serve index.html for SPA
+        index_path = os.path.join(FRONTEND_BUILD_DIR, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+    
+    # Fallback to public directory
     PUBLIC_DIR = os.path.join(Path(__file__).parent.parent, "public")
     if os.path.exists(PUBLIC_DIR):
-        app.mount("/", StaticFiles(directory=PUBLIC_DIR, html=True), name="public")
-        print(f"[OK] Public directory mounted from: {PUBLIC_DIR}")
+        file_path = os.path.join(PUBLIC_DIR, full_path)
+        if os.path.isfile(file_path):
+            return FileResponse(file_path)
+        index_path = os.path.join(PUBLIC_DIR, "index.html")
+        if os.path.exists(index_path):
+            return FileResponse(index_path)
+    
+    raise HTTPException(status_code=404, detail="Not found")
+
+@app.head("/{full_path:path}")
+async def serve_frontend_head(full_path: str):
+    return await serve_frontend(full_path)
 
 # Initialize Cloudinary
 CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
