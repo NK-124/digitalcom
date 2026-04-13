@@ -1,20 +1,21 @@
 # Multi-stage build: Build frontend, then serve full-stack with FastAPI
 FROM node:22-alpine AS frontend-builder
 
+ARG BUILD_TIMESTAMP=force-rebuild
 WORKDIR /app
 
 # Install frontend dependencies
 COPY package*.json ./
 COPY index.js ./
-RUN npm install
+RUN rm -rf node_modules dist && npm install
 
 # Copy frontend code
 COPY src/ ./src/
 COPY public/ ./public/
 COPY webpack.config.js ./
 
-# Build frontend for production
-RUN npm run build
+# Build frontend for production (always fresh - no cache)
+RUN rm -rf dist && npm run build
 
 # Production stage: Python + built frontend
 FROM python:3.11-slim
