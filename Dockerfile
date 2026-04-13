@@ -31,8 +31,20 @@ COPY backend/ ./backend/
 # Copy built frontend from builder stage
 COPY --from=frontend-builder /app/dist ./dist/
 
-# Copy ALL public assets into dist (logo, favicon, oauth-callback, etc.)
-COPY --from=frontend-builder /app/public/ ./dist/
+# Copy ONLY public assets (images, favicon) into dist - NOT index.html
+# This prevents overwriting the webpack-generated index.html
+COPY --from=frontend-builder /app/public/apple-gift-image.jpeg ./dist/
+COPY --from=frontend-builder /app/public/docker-image.jpeg ./dist/
+COPY --from=frontend-builder /app/public/fullstack-image.jpeg ./dist/
+COPY --from=frontend-builder /app/public/hero-image.jpeg ./dist/
+COPY --from=frontend-builder /app/public/kubernetes-image.jpeg ./dist/
+COPY --from=frontend-builder /app/public/linux-image.jpeg ./dist/
+COPY --from=frontend-builder /app/public/logo.jpeg ./dist/
+COPY --from=frontend-builder /app/public/logo.png ./dist/
+COPY --from=frontend-builder /app/public/favicon.ico ./dist/
+COPY --from=frontend-builder /app/public/favicon.png ./dist/
+COPY --from=frontend-builder /app/public/screenshot-image.png ./dist/
+COPY --from=frontend-builder /app/public/WhatsApp* ./dist/
 
 # Create uploads directory
 RUN mkdir -p /app/backend/uploads
