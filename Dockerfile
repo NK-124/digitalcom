@@ -32,9 +32,11 @@ COPY backend/ ./backend/
 COPY --from=frontend-builder /app/dist ./dist/
 
 # Copy public assets (logo, favicon, oauth-callback) to dist
-COPY --from=frontend-builder /app/public/*.png ./dist/
-COPY --from=frontend-builder /app/public/*.jpeg ./dist/
-COPY --from=frontend-builder /app/public/*.html ./dist/
+COPY --from=frontend-builder /app/public/logo.png ./dist/
+COPY --from=frontend-builder /app/public/logo.jpeg ./dist/
+COPY --from=frontend-builder /app/public/favicon.ico ./dist/
+COPY --from=frontend-builder /app/public/favicon.png ./dist/
+COPY --from=frontend-builder /app/public/oauth-callback.html ./dist/
 
 # Create uploads directory
 RUN mkdir -p /app/backend/uploads
