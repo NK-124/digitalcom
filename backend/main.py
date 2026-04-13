@@ -365,28 +365,30 @@ if STRIPE_SECRET_KEY:
 else:
     print("[WARN] Stripe not configured - set STRIPE_SECRET_KEY in .env")
 
+# SPA-aware StaticFiles - serves index.html for SPA routes
+class SPAStaticFiles(StaticFiles):
+    async def get_response(self, path: str, scope):
+        try:
+            return await super().get_response(path, scope)
+        except (HTTPException, Exception) as ex:
+            # If file not found, serve index.html for SPA routing
+            if hasattr(ex, 'status_code') and ex.status_code == 404:
+                return FileResponse(os.path.join(self.directory, "index.html"))
+            raise
+
 # Serve frontend static files in production (DigitalOcean)
 FRONTEND_BUILD_DIR = os.path.join(Path(__file__).parent.parent, "dist")
 if os.path.exists(FRONTEND_BUILD_DIR):
-    # Serve frontend build
-    app.mount("/", StaticFiles(directory=FRONTEND_BUILD_DIR, html=True), name="frontend")
+    # Serve frontend build with SPA support
+    app.mount("/", SPAStaticFiles(directory=FRONTEND_BUILD_DIR), name="frontend")
     print(f"[OK] Frontend static files mounted from: {FRONTEND_BUILD_DIR}")
 else:
     print(f"[WARN] Frontend build directory not found at: {FRONTEND_BUILD_DIR}")
     # Fallback: mount public directory for development
     PUBLIC_DIR = os.path.join(Path(__file__).parent.parent, "public")
     if os.path.exists(PUBLIC_DIR):
-        app.mount("/", StaticFiles(directory=PUBLIC_DIR, html=True), name="public")
+        app.mount("/", SPAStaticFiles(directory=PUBLIC_DIR), name="public")
         print(f"[OK] Public directory mounted from: {PUBLIC_DIR}")
-
-# SPA catch-all route - serve index.html for all non-API routes
-@app.get("/{full_path:path}")
-async def serve_spa(full_path: str):
-    """Serve the SPA frontend for any route not matched by API endpoints"""
-    frontend_dir = FRONTEND_BUILD_DIR if os.path.exists(FRONTEND_BUILD_DIR) else os.path.join(Path(__file__).parent.parent, "public")
-    if os.path.exists(frontend_dir):
-        return FileResponse(os.path.join(frontend_dir, "index.html"))
-    raise HTTPException(status_code=404, detail="Frontend not found")
 
 # Initialize Cloudinary
 CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")
