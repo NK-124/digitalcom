@@ -536,7 +536,7 @@ const styles = StyleSheet.create({
   articleContainer: { backgroundColor: '#FFFFFF', marginVertical: 0, borderRadius: 0, width: '100%', padding: 0 },
   heroImage: { width: '100%', height: 320, resizeMode: 'cover', backgroundColor: '#F5F5F7', alignSelf: 'center', borderRadius: 0, marginBottom: 20 },
   articleSection: { marginBottom: 30, width: '100%' },
-  articleImage: { width: '100%', height: 250, backgroundColor: '#F5F5F7', resizeMode: 'cover', borderRadius: 12 },
+  articleImage: { width: '100%', height: 'auto', backgroundColor: '#F5F5F7', resizeMode: 'contain', borderRadius: 12 },
   articleContent: { width: '100%', paddingVertical: 15, paddingHorizontal: 20 },
   articleTitle: { fontSize: 32, fontWeight: '700', color: '#1D1D1F', marginBottom: 15, lineHeight: 40, paddingHorizontal: 20 },
   articleAuthor: { fontSize: 15, color: '#1D1D1F', fontWeight: '600', marginBottom: 10, paddingBottom: 15, marginHorizontal: 20, borderBottomWidth: 1, borderBottomColor: '#F5F5F7' },
