@@ -359,7 +359,7 @@ const styles = StyleSheet.create({
     display: 'flex',
     alignItems: 'center',
     justifyContent: 'center',
-    marginLeft: 160,
+    marginLeft: 0,
   },
   logoButton: {
     background: 'transparent',

@@ -34,6 +34,7 @@ COPY --from=frontend-builder /app/dist ./dist/
 
 # Copy only public assets that are tracked by git
 COPY --from=frontend-builder /app/public/favicon.ico ./dist/
+COPY --from=frontend-builder /app/public/logo.png ./dist/
 COPY --from=frontend-builder /app/public/oauth-callback.html ./dist/oauth-callback.html
 
 # Create uploads directory
