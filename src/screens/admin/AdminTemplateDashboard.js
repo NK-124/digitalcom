@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import API_URL from '../../utils/apiClient';
 
 const AdminTemplateDashboard = ({ onLogout }) => {
   const [templates, setTemplates] = useState([]);
@@ -22,7 +23,7 @@ const AdminTemplateDashboard = ({ onLogout }) => {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/templates');
+      const response = await fetch(`${API_URL}/api/templates`);
       if (response.ok) {
         const data = await response.json();
         setTemplates(data);
@@ -83,9 +84,9 @@ const AdminTemplateDashboard = ({ onLogout }) => {
       formData.append('tags', tags);
       formData.append('image', image);
 
-      const url = editingTemplate 
-        ? `http://localhost:8000/api/templates/${editingTemplate.id}`
-        : 'http://localhost:8000/api/templates';
+      const url = editingTemplate
+        ? `${API_URL}/api/templates/${editingTemplate.id}`
+        : `${API_URL}/api/templates`;
       
       const method = editingTemplate ? 'PUT' : 'POST';
 
@@ -142,7 +143,7 @@ const AdminTemplateDashboard = ({ onLogout }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(`http://localhost:8000/api/templates/${id}`, {
+              const response = await fetch(`${API_URL}/api/templates/${id}`, {
                 method: 'DELETE',
               });
               

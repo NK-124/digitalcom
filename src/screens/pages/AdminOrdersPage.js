@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity } from 'react-native';
 import AppleNavbar from '../../components/AppleNavbar';
+import API_URL from '../../utils/apiClient';
 
 const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
   const [orders, setOrders] = useState([]);
@@ -12,7 +13,7 @@ const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
 
   const loadOrders = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/orders');
+      const response = await fetch(`${API_URL}/api/orders`);
       if (response.ok) {
         const data = await response.json();
         setOrders(data);
@@ -28,7 +29,7 @@ const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/orders/${orderId}`, {
+      const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })

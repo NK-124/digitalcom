@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import API_URL from '../../utils/apiClient';
 
 const AdminCourseDashboard = ({ onLogout }) => {
   const [courses, setCourses] = useState([]);
@@ -31,7 +32,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/courses');
+      const response = await fetch(`${API_URL}/api/courses`);
       if (response.ok) {
         const data = await response.json();
         setCourses(data);
@@ -79,7 +80,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
       formData.append('description', description);
       formData.append('thumbnail', thumbnail);
 
-      const response = await fetch('http://localhost:8000/api/courses', {
+      const response = await fetch(`${API_URL}/api/courses`, {
         method: 'POST',
         body: formData,
       });
@@ -111,7 +112,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
       formData.append('video_url', videoUrl);
       formData.append('duration', videoDuration);
 
-      const response = await fetch(`http://localhost:8000/api/courses/${selectedCourse.id}/videos`, {
+      const response = await fetch(`${API_URL}/api/courses/${selectedCourse.id}/videos`, {
         method: 'POST',
         body: formData,
       });
@@ -142,7 +143,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
       formData.append('title', noteTitle);
       formData.append('content', noteContent);
 
-      const response = await fetch(`http://localhost:8000/api/courses/${selectedCourse.id}/notes`, {
+      const response = await fetch(`${API_URL}/api/courses/${selectedCourse.id}/notes`, {
         method: 'POST',
         body: formData,
       });
@@ -172,7 +173,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
       formData.append('title', pdfTitle);
       formData.append('pdf_file', pdfFile);
 
-      const response = await fetch(`http://localhost:8000/api/courses/${selectedCourse.id}/pdfs`, {
+      const response = await fetch(`${API_URL}/api/courses/${selectedCourse.id}/pdfs`, {
         method: 'POST',
         body: formData,
       });
@@ -199,7 +200,7 @@ const AdminCourseDashboard = ({ onLogout }) => {
         style: 'destructive',
         onPress: async () => {
           try {
-            const response = await fetch(`http://localhost:8000/api/courses/${id}`, { method: 'DELETE' });
+            const response = await fetch(`${API_URL}/api/courses/${id}`, { method: 'DELETE' });
             if (response.ok) {
               fetchCourses();
               Alert.alert('Success', 'Course deleted!');

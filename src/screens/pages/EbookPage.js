@@ -5,6 +5,7 @@ import ContactUs from '../../components/ContactUs';
 import { useToast } from '../../components/ToastNotification';
 import { addToCart } from '../../utils/cart';
 import { useAuth } from '../../utils/auth';
+import API_URL from '../../utils/apiClient';
 
 const EbookPage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -64,7 +65,7 @@ const EbookPage = ({ onNavigate, onSignUp }) => {
 
   const checkAdminStatus = async (email) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/check-admin?email=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/check-admin?email=${encodeURIComponent(email)}`);
       if (response.ok) {
         const data = await response.json();
         setIsAdmin(data.is_admin || false);
@@ -76,7 +77,7 @@ const EbookPage = ({ onNavigate, onSignUp }) => {
 
   const fetchEbooks = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/ebooks');
+      const response = await fetch(`${API_URL}/api/ebooks`);
       if (response.ok) {
         const data = await response.json();
         setEbooks(data);
@@ -170,8 +171,8 @@ const EbookPage = ({ onNavigate, onSignUp }) => {
       }
 
       const url = editingBook
-        ? `http://localhost:8000/api/ebooks/${editingBook.id}`
-        : 'http://localhost:8000/api/ebooks';
+        ? `${API_URL}/api/ebooks/${editingBook.id}`
+        : `${API_URL}/api/ebooks`;
       const method = editingBook ? 'PUT' : 'POST';
 
       const response = await fetch(url, { method, body: formData });
@@ -215,7 +216,7 @@ const EbookPage = ({ onNavigate, onSignUp }) => {
     setShowDeleteModal(false);
     if (!deleteTargetId) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/ebooks/${deleteTargetId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/ebooks/${deleteTargetId}`, { method: 'DELETE' });
       if (response.ok) {
         toast.success('eBook deleted successfully!');
         fetchEbooks();

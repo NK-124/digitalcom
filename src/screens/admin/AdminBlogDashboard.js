@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import API_URL from '../../utils/apiClient';
 
 const AdminBlogDashboard = ({ onLogout }) => {
   const [blogs, setBlogs] = useState([]);
@@ -39,7 +40,7 @@ const AdminBlogDashboard = ({ onLogout }) => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/blogs');
+      const response = await fetch(`${API_URL}/api/blogs`);
       if (response.ok) {
         const data = await response.json();
         setBlogs(data);
@@ -121,9 +122,9 @@ const AdminBlogDashboard = ({ onLogout }) => {
       if (image4) formData.append('image_4', image4);
       if (image5) formData.append('image_5', image5);
 
-      const url = editingBlog 
-        ? `http://localhost:8000/api/blogs/${editingBlog.id}`
-        : 'http://localhost:8000/api/blogs';
+      const url = editingBlog
+        ? `${API_URL}/api/blogs/${editingBlog.id}`
+        : `${API_URL}/api/blogs`;
       
       const method = editingBlog ? 'PUT' : 'POST';
 
@@ -189,7 +190,7 @@ const AdminBlogDashboard = ({ onLogout }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(`http://localhost:8000/api/blogs/${id}`, {
+              const response = await fetch(`${API_URL}/api/blogs/${id}`, {
                 method: 'DELETE',
               });
               

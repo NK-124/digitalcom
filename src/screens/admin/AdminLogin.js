@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { setCookie } from '../../utils/cookies';
+import API_URL from '../../utils/apiClient';
 
 const AdminLogin = ({ onLogin }) => {
   const [username, setUsername] = useState('');
@@ -16,7 +17,7 @@ const AdminLogin = ({ onLogin }) => {
     setLoading(true);
 
     try {
-      const response = await fetch('http://localhost:8000/api/admin/login', {
+      const response = await fetch(`${API_URL}/api/admin/login`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, ScrollView, ActivityIndicator
 import AppleNavbar from '../../components/AppleNavbar';
 import { useToast } from '../../components/ToastNotification';
 import { addToCart } from '../../utils/cart';
+import API_URL from '../../utils/apiClient';
 
 const EbookDetailPage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -50,7 +51,7 @@ const EbookDetailPage = ({ onNavigate, onSignUp }) => {
 
   const fetchEbook = async (id) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/ebooks/${id}`);
+      const response = await fetch(`${API_URL}/api/ebooks/${id}`);
       if (response.ok) {
         const data = await response.json();
         setEbook(data);

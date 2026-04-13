@@ -4,6 +4,7 @@ import AppleNavbar from '../../components/AppleNavbar';
 import ContactUs from '../../components/ContactUs';
 import { useToast } from '../../components/ToastNotification';
 import { useAuth } from '../../utils/auth';
+import API_URL from '../../utils/apiClient';
 
 const BlogPage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -96,7 +97,7 @@ const BlogPage = ({ onNavigate, onSignUp }) => {
 
   const checkAdminStatus = async (email) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/check-admin?email=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/check-admin?email=${encodeURIComponent(email)}`);
       if (response.ok) {
         const data = await response.json();
         setIsAdmin(data.is_admin || false);
@@ -108,7 +109,7 @@ const BlogPage = ({ onNavigate, onSignUp }) => {
 
   const fetchBlogs = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/blogs');
+      const response = await fetch(`${API_URL}/api/blogs`);
       if (response.ok) {
         const data = await response.json();
         console.log('Fetched blogs:', data);
@@ -129,7 +130,7 @@ const BlogPage = ({ onNavigate, onSignUp }) => {
     
     // Fetch full blog details
     try {
-      const response = await fetch(`http://localhost:8000/api/blogs/${blog.id}`);
+      const response = await fetch(`${API_URL}/api/blogs/${blog.id}`);
       if (response.ok) {
         const fullBlog = await response.json();
         console.log('Full blog data:', fullBlog);
@@ -252,7 +253,7 @@ const BlogPage = ({ onNavigate, onSignUp }) => {
       if (image4) formData.append('image_4', image4);
       if (image5) formData.append('image_5', image5);
 
-      const url = editingBlog ? `http://localhost:8000/api/blogs/${editingBlog.id}` : 'http://localhost:8000/api/blogs';
+      const url = editingBlog ? `${API_URL}/api/blogs/${editingBlog.id}` : `${API_URL}/api/blogs`;
       const response = await fetch(url, {
         method: editingBlog ? 'PUT' : 'POST',
         body: formData
@@ -278,7 +279,7 @@ const BlogPage = ({ onNavigate, onSignUp }) => {
   const handleDelete = async (blogId) => {
     if (!confirm('Delete this blog?')) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/blogs/${blogId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/blogs/${blogId}`, { method: 'DELETE' });
       if (response.ok) { 
         toast.success('Blog deleted successfully!'); 
         fetchBlogs(); 
@@ -347,7 +348,7 @@ const BlogPage = ({ onNavigate, onSignUp }) => {
     const fixImageUrl = (url) => {
       if (!url) return null;
       if (url.startsWith('/uploads/')) {
-        return `http://localhost:8000${url}`;
+        return `${API_URL}${url}`;
       }
       return url;
     };

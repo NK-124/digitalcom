@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import API_URL from '../../utils/apiClient';
 
 const AdminEbookDashboard = ({ onLogout }) => {
   const [ebooks, setEbooks] = useState([]);
@@ -45,7 +46,7 @@ const AdminEbookDashboard = ({ onLogout }) => {
 
   const fetchEbooks = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/ebooks');
+      const response = await fetch(`${API_URL}/api/ebooks`);
       if (response.ok) {
         const data = await response.json();
         setEbooks(data);
@@ -142,9 +143,9 @@ const AdminEbookDashboard = ({ onLogout }) => {
       if (video4) formData.append('video_4', video4);
       if (video5) formData.append('video_5', video5);
 
-      const url = editingBook 
-        ? `http://localhost:8000/api/ebooks/${editingBook.id}`
-        : 'http://localhost:8000/api/ebooks';
+      const url = editingBook
+        ? `${API_URL}/api/ebooks/${editingBook.id}`
+        : `${API_URL}/api/ebooks`;
       
       const method = editingBook ? 'PUT' : 'POST';
 
@@ -198,7 +199,7 @@ const AdminEbookDashboard = ({ onLogout }) => {
           style: 'destructive',
           onPress: async () => {
             try {
-              const response = await fetch(`http://localhost:8000/api/ebooks/${id}`, {
+              const response = await fetch(`${API_URL}/api/ebooks/${id}`, {
                 method: 'DELETE',
               });
               

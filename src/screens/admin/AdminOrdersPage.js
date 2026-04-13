@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity, Image, Modal, TextInput } from 'react-native';
 import AppleNavbar from '../../components/AppleNavbar';
 import { useToast } from '../../components/ToastNotification';
+import API_URL from '../../utils/apiClient';
 
 const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -21,7 +22,7 @@ const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
 
   const loadOrders = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/orders');
+      const response = await fetch(`${API_URL}/api/orders`);
       if (response.ok) {
         const data = await response.json();
         setOrders(data);
@@ -37,7 +38,7 @@ const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
 
   const updateOrderStatus = async (orderId, status) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/orders/${orderId}`, {
+      const response = await fetch(`${API_URL}/api/orders/${orderId}`, {
         method: 'PUT',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ status })
@@ -95,7 +96,7 @@ const AdminOrdersPage = ({ onNavigate, onSignUp }) => {
       if (videoFile) formData.append('video', videoFile);
       if (zipFile) formData.append('zip_file', zipFile);
 
-      const response = await fetch(`http://localhost:8000/api/orders/${selectedOrder.id}/deliverable`, {
+      const response = await fetch(`${API_URL}/api/orders/${selectedOrder.id}/deliverable`, {
         method: 'PUT',
         body: formData
       });

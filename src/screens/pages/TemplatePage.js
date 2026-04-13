@@ -5,6 +5,7 @@ import ContactUs from '../../components/ContactUs';
 import { useToast } from '../../components/ToastNotification';
 import { addToCart } from '../../utils/cart';
 import { useAuth } from '../../utils/auth';
+import API_URL from '../../utils/apiClient';
 
 const CATEGORIES = ['Landing Page', 'Ecommerce Website', 'Portfolio', 'Business', 'Blog', 'Admin'];
 
@@ -121,7 +122,7 @@ const TemplatePage = ({ onNavigate, onSignUp }) => {
     window.history.pushState({ page: 'template', templateId: template.id }, '', `/template/${template.id}`);
 
     try {
-      const response = await fetch(`http://localhost:8000/api/templates/${template.id}`);
+      const response = await fetch(`${API_URL}/api/templates/${template.id}`);
       if (response.ok) {
         const fullTemplate = await response.json();
         setSelectedTemplate(fullTemplate);
@@ -134,7 +135,7 @@ const TemplatePage = ({ onNavigate, onSignUp }) => {
 
   const checkAdminStatus = async (email) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/check-admin?email=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/check-admin?email=${encodeURIComponent(email)}`);
       if (response.ok) {
         const data = await response.json();
         const isAdminValue = data.is_admin || false;
@@ -150,7 +151,7 @@ const TemplatePage = ({ onNavigate, onSignUp }) => {
 
   const fetchTemplates = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/templates');
+      const response = await fetch(`${API_URL}/api/templates`);
       if (response.ok) {
         const data = await response.json();
         setTemplates(Array.isArray(data) ? data : []);
@@ -240,7 +241,7 @@ const TemplatePage = ({ onNavigate, onSignUp }) => {
       templateImages.forEach((img, index) => {
         if (img) formData.append(`image_${index + 1}`, img);
       });
-      const url = editingTemplate ? `http://localhost:8000/api/templates/${editingTemplate.id}` : 'http://localhost:8000/api/templates';
+      const url = editingTemplate ? `${API_URL}/api/templates/${editingTemplate.id}` : `${API_URL}/api/templates`;
       const response = await fetch(url, {
         method: editingTemplate ? 'PUT' : 'POST',
         body: formData
@@ -263,7 +264,7 @@ const TemplatePage = ({ onNavigate, onSignUp }) => {
   const handleDelete = async (templateId) => {
     if (!confirm('Delete this template?')) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/templates/${templateId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/templates/${templateId}`, { method: 'DELETE' });
       if (response.ok) {
         toast.success('Template deleted!');
         fetchTemplates();

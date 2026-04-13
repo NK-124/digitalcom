@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, ScrollView, ActivityIndicator, TouchableOpacity
 import AppleNavbar from '../../components/AppleNavbar';
 import { useToast } from '../../components/ToastNotification';
 import { useAuth } from '../../utils/auth';
+import API_URL from '../../utils/apiClient';
 
 const MyOrdersPage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -35,7 +36,7 @@ const MyOrdersPage = ({ onNavigate, onSignUp }) => {
 
   const loadOrders = async (email) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/user-orders?email=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/user-orders?email=${encodeURIComponent(email)}`);
       if (response.ok) {
         const data = await response.json();
         console.log('Orders loaded:', data);

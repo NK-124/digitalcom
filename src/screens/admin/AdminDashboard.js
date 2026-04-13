@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TextInput, TouchableOpacity, StyleSheet, Image, ScrollView, Alert, ActivityIndicator } from 'react-native';
+import API_URL from '../../utils/apiClient';
 
 const AdminDashboard = ({ onLogout, onSectionChange }) => {
   const [giftCards, setGiftCards] = useState([]);
@@ -43,7 +44,7 @@ const AdminDashboard = ({ onLogout, onSectionChange }) => {
 
   const fetchGiftCards = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/gift-cards');
+      const response = await fetch(`${API_URL}/api/gift-cards`);
       if (response.ok) {
         const data = await response.json();
         setGiftCards(data);
@@ -133,9 +134,9 @@ const AdminDashboard = ({ onLogout, onSectionChange }) => {
       if (video4) formData.append('video_4', video4);
       if (video5) formData.append('video_5', video5);
 
-      const url = editingCard 
-        ? `http://localhost:8000/api/gift-cards/${editingCard.id}`
-        : 'http://localhost:8000/api/gift-cards';
+      const url = editingCard
+        ? `${API_URL}/api/gift-cards/${editingCard.id}`
+        : `${API_URL}/api/gift-cards`;
       
       const method = editingCard ? 'PUT' : 'POST';
 

@@ -5,6 +5,7 @@ import ContactUs from '../../components/ContactUs';
 import { useToast } from '../../components/ToastNotification';
 import { addToCart } from '../../utils/cart';
 import { useAuth } from '../../utils/auth';
+import API_URL from '../../utils/apiClient';
 
 const CoursePage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -58,7 +59,7 @@ const CoursePage = ({ onNavigate, onSignUp }) => {
 
   const checkAdminStatus = async (email) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/check-admin?email=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/check-admin?email=${encodeURIComponent(email)}`);
       if (response.ok) {
         const data = await response.json();
         setIsAdmin(data.is_admin || false);
@@ -70,7 +71,7 @@ const CoursePage = ({ onNavigate, onSignUp }) => {
 
   const fetchCourses = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/courses');
+      const response = await fetch(`${API_URL}/api/courses`);
       if (response.ok) {
         const data = await response.json();
         setCourses(Array.isArray(data) ? data : []);
@@ -133,8 +134,8 @@ const CoursePage = ({ onNavigate, onSignUp }) => {
         formData.append('image', courseImage);
       }
       const url = editingCourse
-        ? `http://localhost:8000/api/courses/${editingCourse.id}`
-        : 'http://localhost:8000/api/courses';
+        ? `${API_URL}/api/courses/${editingCourse.id}`
+        : `${API_URL}/api/courses`;
       const response = await fetch(url, {
         method: editingCourse ? 'PUT' : 'POST',
         body: formData
@@ -163,7 +164,7 @@ const CoursePage = ({ onNavigate, onSignUp }) => {
     setShowDeleteModal(false);
     if (!deleteTargetId) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/courses/${deleteTargetId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/courses/${deleteTargetId}`, { method: 'DELETE' });
       if (response.ok) {
         toast.success('Course deleted successfully!');
         fetchCourses();

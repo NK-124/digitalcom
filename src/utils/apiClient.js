@@ -1,4 +1,16 @@
-const API_URL = 'http://localhost:8000';
+// Auto-detect API URL based on environment
+const getApiUrl = () => {
+  // If running on localhost, use localhost:8000
+  if (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') {
+    return 'http://localhost:8000';
+  }
+  // In production, API is served from the same origin (full-stack deployment)
+  return window.location.origin;
+};
+
+const API_URL = getApiUrl();
+
+export default API_URL;
 
 // Event system for global error handling
 const eventTarget = new EventTarget();

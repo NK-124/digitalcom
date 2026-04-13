@@ -4,6 +4,7 @@ import AppleNavbar from '../../components/AppleNavbar';
 import { useToast } from '../../components/ToastNotification';
 import { getCart, removeFromCart, clearCart, getCartCount } from '../../utils/cart';
 import { useAuth } from '../../utils/auth';
+import API_URL from '../../utils/apiClient';
 
 const CartPage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -111,7 +112,7 @@ const CartPage = ({ onNavigate, onSignUp }) => {
     setProcessing(true);
     try {
       // Step 1: Create Checkout Session on backend
-      const response = await fetch('http://localhost:8000/api/create-checkout-session', {
+      const response = await fetch(`${API_URL}/api/create-checkout-session`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({

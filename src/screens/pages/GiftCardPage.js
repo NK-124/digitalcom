@@ -5,6 +5,7 @@ import ContactUs from '../../components/ContactUs';
 import { useToast } from '../../components/ToastNotification';
 import { addToCart } from '../../utils/cart';
 import { useAuth } from '../../utils/auth';
+import API_URL from '../../utils/apiClient';
 
 const GiftCardPage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -66,7 +67,7 @@ const GiftCardPage = ({ onNavigate, onSignUp }) => {
 
   const checkAdminStatus = async (email) => {
     try {
-      const response = await fetch(`http://localhost:8000/api/check-admin?email=${encodeURIComponent(email)}`);
+      const response = await fetch(`${API_URL}/api/check-admin?email=${encodeURIComponent(email)}`);
       if (response.ok) {
         const data = await response.json();
         setIsAdmin(data.is_admin || false);
@@ -78,7 +79,7 @@ const GiftCardPage = ({ onNavigate, onSignUp }) => {
 
   const fetchGiftCards = async () => {
     try {
-      const response = await fetch('http://localhost:8000/api/gift-cards');
+      const response = await fetch(`${API_URL}/api/gift-cards`);
       if (response.ok) {
         const data = await response.json();
         setGiftCards(Array.isArray(data) ? data : []);
@@ -205,8 +206,8 @@ const GiftCardPage = ({ onNavigate, onSignUp }) => {
       console.log('===================\n');
 
       const url = editingCard
-        ? `http://localhost:8000/api/gift-cards/${editingCard.id}`
-        : 'http://localhost:8000/api/gift-cards';
+        ? `${API_URL}/api/gift-cards/${editingCard.id}`
+        : `${API_URL}/api/gift-cards`;
       const method = editingCard ? 'PUT' : 'POST';
 
       const response = await fetch(url, { method, body: formData });
@@ -250,7 +251,7 @@ const GiftCardPage = ({ onNavigate, onSignUp }) => {
     setShowDeleteModal(false);
     if (!deleteTargetId) return;
     try {
-      const response = await fetch(`http://localhost:8000/api/gift-cards/${deleteTargetId}`, { method: 'DELETE' });
+      const response = await fetch(`${API_URL}/api/gift-cards/${deleteTargetId}`, { method: 'DELETE' });
       if (response.ok) {
         toast.success('Gift card deleted successfully!');
         fetchGiftCards();

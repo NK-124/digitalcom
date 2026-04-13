@@ -181,6 +181,8 @@ const AppleNavbar = ({ onNavigate, onSignUp }) => {
                         {currentUser.picture ? (
                           <Image source={{ uri: currentUser.picture }} style={styles.sidebarUserAvatar} />
                         ) : (
+
+
                           <Image
                             source={{ uri: `https://ui-avatars.com/api/?name=${encodeURIComponent(currentUser.name)}&background=0066CC&color=fff&size=128&bold=true` }}
                             style={styles.sidebarUserAvatar}

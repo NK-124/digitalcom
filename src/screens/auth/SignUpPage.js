@@ -2,6 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Image, Modal, Dimensions, ScrollView } from 'react-native';
 import AppleNavbar from '../../components/AppleNavbar';
 import { getCookie, setCookie, removeCookie } from '../../utils/cookies';
+import API_URL from '../../utils/apiClient';
 
 const SignUpPage = ({ onNavigate, onSignUp }) => {
   const [error, setError] = useState('');
@@ -30,7 +31,7 @@ const SignUpPage = ({ onNavigate, onSignUp }) => {
   // Send token to backend for verification (background sync)
   const authenticateWithBackend = async (provider, credentials) => {
     try {
-      fetch(`http://localhost:8000/api/auth/${provider}`, {
+      fetch(`${API_URL}/api/auth/${provider}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -48,7 +49,7 @@ const SignUpPage = ({ onNavigate, onSignUp }) => {
     
     try {
       // Wait for backend to set HTTP-only session cookies
-      await fetch(`http://localhost:8000/api/auth/${provider}`, {
+      await fetch(`${API_URL}/api/auth/${provider}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
@@ -192,7 +193,7 @@ const SignUpPage = ({ onNavigate, onSignUp }) => {
     setShowPermissionModal(false);
     handleSuccess({ name: oauthData?.name || 'User', email: oauthData?.email, provider: selectedProvider.toLowerCase() });
     try {
-      fetch(`http://localhost:8000/api/auth/${selectedProvider.toLowerCase()}`, {
+      fetch(`${API_URL}/api/auth/${selectedProvider.toLowerCase()}`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',

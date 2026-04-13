@@ -1,7 +1,8 @@
 import { useState, useEffect, useCallback } from 'react';
-import { apiClient, authEvents } from './apiClient';
+import apiClient from './apiClient';
 
-const API_URL = 'http://localhost:8000';
+// Use centralized API URL from apiClient
+import API_URL from './apiClient';
 
 /**
  * Get current authenticated user from JWT token in backend

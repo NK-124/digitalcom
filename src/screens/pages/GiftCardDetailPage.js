@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, Image, TouchableOpacity, ScrollView, ActivityIn
 import AppleNavbar from '../../components/AppleNavbar';
 import { useToast } from '../../components/ToastNotification';
 import { addToCart } from '../../utils/cart';
+import API_URL from '../../utils/apiClient';
 
 const GiftCardDetailPage = ({ onNavigate, onSignUp }) => {
   const toast = useToast();
@@ -57,7 +58,7 @@ const GiftCardDetailPage = ({ onNavigate, onSignUp }) => {
   const fetchGiftCard = async (cardId) => {
     try {
       console.log('Fetching gift card:', cardId);
-      const response = await fetch(`http://localhost:8000/api/gift-cards/${cardId}`);
+      const response = await fetch(`${API_URL}/api/gift-cards/${cardId}`);
       console.log('Response status:', response.status);
       
       if (response.ok) {
