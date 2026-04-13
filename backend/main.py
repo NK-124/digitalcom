@@ -43,9 +43,16 @@ app.add_exception_handler(RateLimitExceeded, _rate_limit_exceeded_handler)
 
 # CORS - Allow only specific frontend domain (enterprise security)
 # NO wildcard - explicitly allow frontend origin
+frontend_url = os.getenv("FRONTEND_URL", "http://localhost:3000")
+allowed_origins = ["http://localhost:3000", "http://127.0.0.1:3000", frontend_url]
+# Add production domains if FRONTEND_URL contains multiple (comma-separated)
+if "," in frontend_url:
+    allowed_origins = [url.strip() for url in frontend_url.split(",")]
+    allowed_origins.extend(["http://localhost:3000", "http://127.0.0.1:3000"])
+
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000"],  # Add production domains in .env
+    allow_origins=allowed_origins,
     allow_credentials=True,
     allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],  # Restrict methods
     allow_headers=["Content-Type", "Authorization"],  # Restrict headers
@@ -357,6 +364,20 @@ if STRIPE_SECRET_KEY:
     print("[OK] Stripe initialized")
 else:
     print("[WARN] Stripe not configured - set STRIPE_SECRET_KEY in .env")
+
+# Serve frontend static files in production (DigitalOcean)
+FRONTEND_BUILD_DIR = os.path.join(Path(__file__).parent.parent, "dist")
+if os.path.exists(FRONTEND_BUILD_DIR):
+    # Serve frontend build
+    app.mount("/", StaticFiles(directory=FRONTEND_BUILD_DIR, html=True), name="frontend")
+    print(f"[OK] Frontend static files mounted from: {FRONTEND_BUILD_DIR}")
+else:
+    print(f"[WARN] Frontend build directory not found at: {FRONTEND_BUILD_DIR}")
+    # Fallback: mount public directory for development
+    PUBLIC_DIR = os.path.join(Path(__file__).parent.parent, "public")
+    if os.path.exists(PUBLIC_DIR):
+        app.mount("/", StaticFiles(directory=PUBLIC_DIR, html=True), name="public")
+        print(f"[OK] Public directory mounted from: {PUBLIC_DIR}")
 
 # Initialize Cloudinary
 CLOUDINARY_CLOUD_NAME = os.getenv("CLOUDINARY_CLOUD_NAME")

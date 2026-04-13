@@ -1,15 +1,15 @@
-name: digitalcom
+name: digitalcom-fullstack
 services:
-- name: backend
+- name: fullstack
   github:
     repo: NK-124/digitalcom
     branch: master
     deploy_on_push: true
-  dockerfile_path: Dockerfile.backend
+  dockerfile_path: Dockerfile
   http_port: 8000
   health_check:
     http_path: /api/health
-    initial_delay_seconds: 10
+    initial_delay_seconds: 30
     period_seconds: 10
     timeout_seconds: 5
     success_threshold: 1
@@ -39,4 +39,6 @@ services:
   - key: GITHUB_CLIENT_SECRET
     scope: RUN_TIME
   - key: STRIPE_SECRET_KEY
+    scope: RUN_TIME
+  - key: FRONTEND_URL
     scope: RUN_TIME
