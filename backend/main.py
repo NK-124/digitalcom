@@ -84,14 +84,13 @@ async def add_security_headers(request: Request, call_next):
     
     # Referrer Policy
     response.headers["Referrer-Policy"] = "strict-origin-when-cross-origin"
-    
+
     # Permissions Policy (disable unused features)
     response.headers["Permissions-Policy"] = "camera=(), microphone=(), geolocation=()"
-    
-    # Remove Cross-Origin-Opener-Policy that blocks window.closed
-    # (Don't set it, or set to same-origin-allow-popups if needed)
-    response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
-    
+
+    # DO NOT set Cross-Origin-Opener-Policy - it blocks OAuth popup postMessage
+    # response.headers["Cross-Origin-Opener-Policy"] = "same-origin-allow-popups"
+
     return response
 
 # Add CORS headers to all responses (including errors)
