@@ -31,6 +31,11 @@ COPY backend/ ./backend/
 # Copy built frontend from builder stage
 COPY --from=frontend-builder /app/dist ./dist/
 
+# Copy public assets (logo, favicon, oauth-callback) to dist
+COPY --from=frontend-builder /app/public/*.png ./dist/
+COPY --from=frontend-builder /app/public/*.jpeg ./dist/
+COPY --from=frontend-builder /app/public/*.html ./dist/
+
 # Create uploads directory
 RUN mkdir -p /app/backend/uploads
 
