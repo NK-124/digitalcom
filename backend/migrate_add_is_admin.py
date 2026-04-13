@@ -1,7 +1,7 @@
 """
 Database Migration Script
 Adds is_admin column to admin_users table
-Run this once to update your Neon database
+Run this once to update your DigitalOcean PostgreSQL database
 """
 
 from sqlalchemy import create_engine, text, inspect

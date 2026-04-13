@@ -21,7 +21,7 @@ load_dotenv(backend_dir / ".env")
 # Use same database as main.py
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./store.db")
 
-# Check if using PostgreSQL (Neon) or SQLite
+# Check if using PostgreSQL (DigitalOcean) or SQLite
 if SQLALCHEMY_DATABASE_URL.startswith("postgresql"):
     engine = create_engine(
         SQLALCHEMY_DATABASE_URL,

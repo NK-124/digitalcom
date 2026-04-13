@@ -121,10 +121,10 @@ except Exception as e:
     print(f"Warning: Firebase initialization failed: {str(e)}. Using local storage.")
     bucket = None
 
-# Database setup - Neon PostgreSQL
+# Database setup - DigitalOcean PostgreSQL
 SQLALCHEMY_DATABASE_URL = os.getenv("DATABASE_URL", "sqlite:///./store.db")
 
-# Check if using PostgreSQL (Neon) or SQLite
+# Check if using PostgreSQL (DigitalOcean) or SQLite
 if SQLALCHEMY_DATABASE_URL.startswith("postgresql"):
     # PostgreSQL connection with connection pooling
     engine = create_engine(
@@ -2472,7 +2472,7 @@ async def delete_template(template_id: int, db: Session = Depends(get_db)):
 # Health check
 @app.get("/api/health")
 async def health_check():
-    return {"status": "healthy", "database": "Neon PostgreSQL" if SQLALCHEMY_DATABASE_URL.startswith("postgresql") else "SQLite"}
+    return {"status": "healthy", "database": "DigitalOcean PostgreSQL" if SQLALCHEMY_DATABASE_URL.startswith("postgresql") else "SQLite"}
 
 # Check admin status
 @app.get("/api/check-admin")

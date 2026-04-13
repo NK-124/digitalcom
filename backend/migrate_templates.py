@@ -6,7 +6,7 @@ load_dotenv('.env')
 
 DATABASE_URL = os.getenv('DATABASE_URL')
 
-# Connect to Neon PostgreSQL
+# Connect to DigitalOcean PostgreSQL
 conn = psycopg2.connect(DATABASE_URL)
 cursor = conn.cursor()
 

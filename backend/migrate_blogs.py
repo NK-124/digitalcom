@@ -1,6 +1,6 @@
 """
 Migration script to add missing columns to the blogs table.
-Run this once to update your existing Neon database schema.
+Run this once to update your existing DigitalOcean PostgreSQL database schema.
 """
 from sqlalchemy import create_engine, text
 from pathlib import Path
