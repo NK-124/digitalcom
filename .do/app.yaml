@@ -1,0 +1,49 @@
+name: digitalcom-backend
+services:
+- name: backend
+  github:
+    repo: NK-124/digitalcom
+    branch: master
+    deploy_on_push: true
+  source_dir: backend
+  build_command: pip install -r requirements.txt
+  run_command: python main.py
+  environment_slug: python
+  instance_count: 1
+  instance_size_slug: basic-xxs
+  http_port: 8000
+  health_check:
+    http_path: /api/health
+    initial_delay_seconds: 10
+    period_seconds: 10
+    timeout_seconds: 5
+    success_threshold: 1
+    failure_threshold: 3
+  envs:
+  - key: DATABASE_URL
+    scope: RUN_TIME
+    value: ${db.DATABASE_URL}
+  - key: SECRET_KEY
+    scope: RUN_TIME
+  - key: ALGORITHM
+    scope: RUN_TIME
+  - key: CLOUDINARY_CLOUD_NAME
+    scope: RUN_TIME
+  - key: CLOUDINARY_API_KEY
+    scope: RUN_TIME
+  - key: CLOUDINARY_API_SECRET
+    scope: RUN_TIME
+  - key: GOOGLE_CLIENT_ID
+    scope: RUN_TIME
+  - key: GOOGLE_CLIENT_SECRET
+    scope: RUN_TIME
+  - key: GITHUB_CLIENT_ID
+    scope: RUN_TIME
+  - key: GITHUB_CLIENT_SECRET
+    scope: RUN_TIME
+  - key: STRIPE_SECRET_KEY
+    scope: RUN_TIME
+databases:
+- name: db
+  engine: PG
+  production: true
