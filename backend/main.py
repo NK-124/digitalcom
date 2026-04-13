@@ -368,7 +368,7 @@ else:
 # Serve frontend static files in production (DigitalOcean)
 FRONTEND_BUILD_DIR = os.path.join(Path(__file__).parent.parent, "dist")
 if os.path.exists(FRONTEND_BUILD_DIR):
-    # Serve frontend build
+    # Serve frontend build (includes public assets copied during Docker build)
     app.mount("/", StaticFiles(directory=FRONTEND_BUILD_DIR, html=True), name="frontend")
     print(f"[OK] Frontend static files mounted from: {FRONTEND_BUILD_DIR}")
 else:
